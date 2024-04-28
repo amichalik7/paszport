@@ -6,10 +6,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
@@ -27,6 +24,9 @@ public class HelloApplication extends Application {
     RadioButton niebieskie = new RadioButton();
     RadioButton piwne = new RadioButton();
     ToggleGroup grupa = new ToggleGroup();
+    String kolor = "niebieskie";
+    Button ok = new Button();
+    Alert wynik = new Alert(Alert.AlertType.NONE, "Wprowadź dane", ButtonType.APPLY);
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
@@ -44,7 +44,21 @@ public class HelloApplication extends Application {
         zielone.setToggleGroup(grupa);
         niebieskie.setToggleGroup(grupa);
         piwne.setToggleGroup(grupa);
+        ok = (Button) scene.lookup("#ok");
 
+        ok.setOnAction(actionEvent -> {
+            String x = nazwisko.getText();
+            wynik.setTitle("");
+            if (!imie.getText().equals("") && !nazwisko.getText().equals("")) {
+                wynik.setContentText(imie.getText() + " " + nazwisko.getText() + " kolor oczu " + kolor);
+            }
+
+            wynik.show();
+        });
+
+        grupa.selectedToggleProperty().addListener((observable, oldValue, newValue) ->{
+            kolor = ((RadioButton) grupa.getSelectedToggle()).getText();
+        });
 
 
         obrazek = (ImageView) scene.lookup("#obrazek");
@@ -54,11 +68,7 @@ public class HelloApplication extends Application {
             @Override
             public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue)
             {
-                if (newPropertyValue)
-                {
-                    System.out.println("Textfield on focus");
-                }
-                else
+                if (!newPropertyValue)
                 {
                     try {
                         obrazek.setImage(new Image(getClass().getResource(numer.getText() + "-zdjecie.jpg").toString()));
